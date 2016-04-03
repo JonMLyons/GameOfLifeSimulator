@@ -1342,14 +1342,15 @@ namespace GameOfLife
             if (isFirst)
             {
                 p.cash += 240000;
-                if (p.hasStock)
-                {
-                    p.cash += 120000;
-                }
-                if (p.hasLife)
-                {
-                    p.cash += 8000;
-                }
+            }
+
+            if (p.hasStock)
+            {
+                p.cash += 120000;
+            }
+            if (p.hasLife)
+            {
+                p.cash += 8000;
             }
 
             isFirst = false;

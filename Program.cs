@@ -30,7 +30,7 @@ namespace GameOfLife
             players.Add(new Player(4, start, true, true, true, true, true, true, true));
 
             // Run the simulation
-            simulateGames(players, false, 100000);
+            simulateGames(players, false, 500000);
 
             // Wait to exit
             Console.WriteLine("Press Enter to Exit");
