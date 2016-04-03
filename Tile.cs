@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GameOfLife
 {
-    public enum ReturnCode { NONE, ROLL_AGAIN, STOP, MISS_TURN, BRIDGE_OUT, RETURN_TO_START, MILLIONAIRE, CAREER, DETOUR };
+    public enum ReturnCode { NONE, ROLL_AGAIN, STOP, BRIDGE_OUT, RETURN_TO_START, MILLIONAIRE, CAREER, DETOUR };
 
 
     public abstract class Tile
@@ -53,7 +53,7 @@ namespace GameOfLife
                 rand = new Random();
             }
 
-            return rand.Next(min, max+1);
+            return rand.Next(min, max + 1);
         }
     }
 
@@ -237,7 +237,7 @@ namespace GameOfLife
                 p.hasLife = true;
             }
         }
-    } 
+    }
 
     public class TileTornadoStrikes : Tile
     {
@@ -309,7 +309,8 @@ namespace GameOfLife
     {
         public override ReturnCode landAction(Player p, List<Player> otherPlayers)
         {
-            return ReturnCode.MISS_TURN;
+            p.missTurn = true;
+            return ReturnCode.NONE;
         }
     }
 
@@ -374,7 +375,8 @@ namespace GameOfLife
     {
         public override ReturnCode landAction(Player p, List<Player> otherPlayers)
         {
-            return ReturnCode.MISS_TURN;
+            p.missTurn = true;
+            return ReturnCode.NONE;
         }
     }
 
@@ -396,7 +398,7 @@ namespace GameOfLife
         {
             p.cash -= 40000;
         }
-    }   
+    }
 
     public class TileIfYouWantFireInsurance : Tile
     {
@@ -420,7 +422,7 @@ namespace GameOfLife
                 p.hasFire = true;
             }
         }
-    }   
+    }
 
     public class TileAuntLeaves50Cats : Tile
     {
@@ -477,7 +479,7 @@ namespace GameOfLife
                 p.hasStock = true;
             }
         }
-    }    
+    }
 
     public class TileWinMountainRoadRace : Tile
     {
@@ -1029,7 +1031,8 @@ namespace GameOfLife
     {
         public override ReturnCode landAction(Player p, List<Player> otherPlayers)
         {
-            return ReturnCode.MISS_TURN;
+            p.missTurn = true;
+            return ReturnCode.NONE;
         }
     }
 
@@ -1146,7 +1149,7 @@ namespace GameOfLife
             p.cash += p.salary;
             if (p.cash < 0)
             {
-                p.cash = (int)((double) p.cash * 1.05);
+                p.cash = (int)((double)p.cash * 1.05);
             }
         }
     }
@@ -1408,7 +1411,8 @@ namespace GameOfLife
     {
         public override ReturnCode landAction(Player p, List<Player> otherPlayers)
         {
-            return ReturnCode.MISS_TURN;
+            p.missTurn = true;
+            return ReturnCode.NONE;
         }
     }
 

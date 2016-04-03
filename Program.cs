@@ -135,7 +135,16 @@ namespace GameOfLife
                 randomPlayers = new List<Player>(players);
             }
 
-     //       Console.WriteLine(randomPlayers[0].id + " " + (randomPlayers[1]).id);
+            // Buy auto insurance
+            foreach(Player p in randomPlayers)
+            {
+                if (!p.hasAuto && p.BuyAuto)
+                {
+                    p.hasAuto = true;
+                    p.cash -= 1000;
+                }
+            }
+            
 
             bool allDone = false;
             while (!allDone)
@@ -150,18 +159,20 @@ namespace GameOfLife
 
                     allDone = false;
 
-                    // Do the Start tile action so folks can buy insurance
-                    List<Player> others = new List<Player>(randomPlayers);
-                    others.Remove(p);
-                    p.location.landAction(p, others);
-
-                    simulateRoll(p, randomPlayers);
+                    if (p.missTurn)
+                    {
+                        p.missTurn = false;
+                    }
+                    else
+                    {
+                        simulateRoll(p, randomPlayers);
+                    }
                 }
             }
         }
 
         static void simulateRoll(Player p, List<Player> players)
-        {
+        { 
             List<Player> others = new List<Player>(players);
             others.Remove(p);
 
@@ -170,13 +181,16 @@ namespace GameOfLife
 
             // Move based on spin
             for (int i = 1; i <= spin; i++)
-            {
+            {   
                 p.location = p.location.getNextTile(p);
-
-                // Stop early if a tile requires it
-                if (p.location.passAction(p, others) == ReturnCode.STOP)
+            
+                // Check on action when passing tiles
+                if (i < spin)
                 {
-                    break;
+                    if (p.location.passAction(p, others) == ReturnCode.STOP)
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -189,46 +203,29 @@ namespace GameOfLife
             switch (p.location.landAction(p, others))
             {
                 case ReturnCode.BRIDGE_OUT:
-                    r.delta = p.cash - cashStart;
-                    p.rollLog.Add(r);
                     p.location = bridgeOutSetback;
                     break;
-                case ReturnCode.MISS_TURN:
-                    r.delta = p.cash - cashStart;
-                    p.rollLog.Add(r);
-                    p.missTurn = true;
-                    break;
                 case ReturnCode.RETURN_TO_START:
-                    r.delta = p.cash - cashStart;
-                    p.rollLog.Add(r);
                     p.location = start;
                     break;
                 case ReturnCode.ROLL_AGAIN:
-                    r.delta = p.cash - cashStart;
-                    p.rollLog.Add(r);
                     simulateRoll(p, players);
                     break;
                 case ReturnCode.MILLIONAIRE:
-                    r.delta = p.cash - cashStart;
-                    p.rollLog.Add(r);
                     p.location = null;
                     break;
                 case ReturnCode.CAREER:
-                    r.delta = p.cash - cashStart;
-                    p.rollLog.Add(r);
                     p.location = firstPayday;
+                    p.location.landAction(p, others);
                     break;
                 case ReturnCode.DETOUR:
-                    r.delta = p.cash - cashStart;
-                    p.rollLog.Add(r);
                     p.location = polarExpedition;
                     polarExpedition.landAction(p, others);
                     break;
-                default:
-                    r.delta = p.cash - cashStart;
-                    p.rollLog.Add(r);
-                    break;
             }
+
+            r.delta = p.cash - cashStart;
+            p.rollLog.Add(r);
         }
 
 
@@ -993,8 +990,7 @@ namespace GameOfLife
             current = new TileCarRepairs();
             current.addNextTile(next);
             tiles.Add(current);
-            CaptureLion.addNextTile(current);
-            
+            CaptureLion.addNextTile(current);          
 
 
             // non-Mountain fork
