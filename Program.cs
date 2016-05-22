@@ -15,6 +15,8 @@ namespace GameOfLife
         private static Tile polarExpedition;
         private static Tile firstPayday;
         private static List<Tile> tiles;
+        private static Player firstMillionaire = null;
+        private static int firstMillionaireNumber = -1;
 
 
         static void Main(string[] args)
@@ -40,7 +42,8 @@ namespace GameOfLife
 
         static void simulateGames(List<Player> players, bool randomOrder, int numGames)
         {
-            int[] numWins = new int[players.Count];
+            int numTies = 0;
+            int[] numWins = new int[players.Count];            
             for (int i = 0; i < players.Count; i++)
             {
                 numWins[i] = 0;
@@ -48,8 +51,8 @@ namespace GameOfLife
             
             int numSons = 0;
             int numDaughters = 0;
-            int minTCash = int.MaxValue;
-            int maxTCash = int.MinValue;
+            int minCash = int.MaxValue;
+            int maxCash = int.MinValue;
             long avgCash = 0;
             int num = 0;            
 
@@ -59,38 +62,36 @@ namespace GameOfLife
             {
                 simulateGame(players, randomOrder);
 
-                Player winner = null;
-                int maxCash = int.MinValue;
+                int winnerCash = players.Max(element => element.cash);
+                List<Player> winners = players.FindAll(element => element.cash == winnerCash);
 
-                foreach (Player p in players)
+                if(winners.Count == 1)
                 {
-                    if (p.cash > maxCash)
-                    {
-                        maxCash = p.cash;
-                        winner = p;
-                    }
-                    else if (p.cash == maxCash)
-                    {
-                        winner = null;
-                        break;
-                    }
+                    // There is a single winner.
+                    numWins[winners[0].Id]++;
+                }
+                else if(winners.Count > 1)
+                {
+                    // Tie
+                    numTies++;
+                }
+                else
+                {
+                    // Something unexpected
+                    throw new Exception("Could not identify winner.");
                 }
 
-                if (winner != null)
-                {
-                    numWins[winner.Id]++;
-                }
 
                 foreach (Player p in players)
                 {
                     numSons += p.sons;
                     numDaughters += p.daughters;
                     num++;
-                    if (p.cash < minTCash)
-                        minTCash = p.cash;
+                    if (p.cash < minCash)
+                        minCash = p.cash;
 
-                    if (p.cash > maxTCash)
-                        maxTCash = p.cash;
+                    if (p.cash > maxCash)
+                        maxCash = p.cash;
 
                     avgCash += p.cash;
                     p.Reset(start);
@@ -104,10 +105,11 @@ namespace GameOfLife
                 Console.WriteLine("Player " + p.Id + ": " + ((double)numWins[p.Id]) / numGames);
             }
 
+            Console.WriteLine("Ties:     " + ((double)numTies / numGames));
             Console.WriteLine("Average Sons: " + ((double)numSons) / num);
             Console.WriteLine("Average Daughters: " + ((double)numDaughters) / num);
-            Console.WriteLine("Max Cash: " + maxTCash);
-            Console.WriteLine("Min Cash: " + minTCash);
+            Console.WriteLine("Max Cash: " + maxCash);
+            Console.WriteLine("Min Cash: " + minCash);
             Console.WriteLine("Average Cash: " + (avgCash) / (long)num);
             Console.WriteLine("Time: " + (DateTime.Now.Ticks - startTime.Ticks) / 10000000 + " seconds");
         }
@@ -125,6 +127,7 @@ namespace GameOfLife
                     {
                         rand = new Random();
                     }
+
                     int r = rand.Next(0, playerCopy.Count);
                     randomPlayers.Add(playerCopy[r]);
                     playerCopy.RemoveAt(r);
@@ -154,9 +157,11 @@ namespace GameOfLife
                 {
                     if (p.location == null)
                     {
+                        // Skip players who have completed the game
                         continue;
                     }
 
+                    // At least one player hasn't finished yet
                     allDone = false;
 
                     if (p.missTurn)
@@ -172,12 +177,18 @@ namespace GameOfLife
         }
 
         static void simulateRoll(Player p, List<Player> players)
-        { 
+        {
             List<Player> others = new List<Player>(players);
             others.Remove(p);
 
             // Spin the wheel
-            int spin = spinWheel();           
+            int spin = spinWheel();
+
+            if (spin == firstMillionaireNumber)
+            {
+                firstMillionaire.cash += 24000;
+                p.cash -= 24000;
+            }
 
             // Move based on spin
             for (int i = 1; i <= spin; i++)
@@ -212,6 +223,11 @@ namespace GameOfLife
                     simulateRoll(p, players);
                     break;
                 case ReturnCode.MILLIONAIRE:
+                    if(firstMillionaire == null)
+                    {
+                        firstMillionaire = p;
+                        firstMillionaireNumber = spinWheel();
+                    }
                     p.location = null;
                     break;
                 case ReturnCode.CAREER:
@@ -242,6 +258,9 @@ namespace GameOfLife
 
         static void resetTiles()
         {
+            firstMillionaire = null;
+            firstMillionaireNumber = -1;
+
             foreach (Tile t in tiles)
             {
                 t.reset();
