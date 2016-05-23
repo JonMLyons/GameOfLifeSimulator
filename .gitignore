@@ -44,3 +44,7 @@ Temporary Items
 /bin/Debug
 /obj/Debug
 /GameOfLife.suo
+/bin/Release
+/obj/Release
+/GameOfLife.csproj.user
+/.vs
