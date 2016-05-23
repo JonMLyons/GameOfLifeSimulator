@@ -1149,6 +1149,7 @@ namespace GameOfLife
             p.cash += p.salary;
             if (p.cash < 0)
             {
+                // Pay interest on loan
                 p.cash = (int)((double)p.cash * 1.05);
             }
         }

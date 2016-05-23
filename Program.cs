@@ -27,12 +27,10 @@ namespace GameOfLife
             List<Player> players = new List<Player>();
             players.Add(new Player(0, start, true, true, true, true, true, true, true));
             players.Add(new Player(1, start, true, true, true, true, true, true, true));
-            players.Add(new Player(2, start, true, true, true, true, true, true, true));
-            players.Add(new Player(3, start, true, true, true, true, true, true, true));
-            players.Add(new Player(4, start, true, true, true, true, true, true, true));
+
 
             // Run the simulation
-            simulateGames(players, false, 500000);
+            simulateGames(players, true, 1000000);
 
             // Wait to exit
             Console.WriteLine("Press Enter to Exit");
@@ -47,6 +45,12 @@ namespace GameOfLife
             for (int i = 0; i < players.Count; i++)
             {
                 numWins[i] = 0;
+            }
+
+            Dictionary<Career, int> numWinsByCareer = new Dictionary<Career, int>();
+            foreach(Career c in Enum.GetValues(typeof(Career)))
+            {
+                numWinsByCareer.Add(c, 0);
             }
             
             int numSons = 0;
@@ -64,11 +68,13 @@ namespace GameOfLife
 
                 int winnerCash = players.Max(element => element.cash);
                 List<Player> winners = players.FindAll(element => element.cash == winnerCash);
-
+                
                 if(winners.Count == 1)
                 {
                     // There is a single winner.
-                    numWins[winners[0].Id]++;
+                    Player winner = winners[0];
+                    numWins[winner.Id]++;
+             //       numWinsByCareer[winner.career]++;
                 }
                 else if(winners.Count > 1)
                 {
@@ -89,10 +95,11 @@ namespace GameOfLife
                     num++;
                     if (p.cash < minCash)
                         minCash = p.cash;
-
+                    
                     if (p.cash > maxCash)
                         maxCash = p.cash;
 
+                    numWinsByCareer[p.career]++;
                     avgCash += p.cash;
                     p.Reset(start);
                 }
@@ -112,6 +119,10 @@ namespace GameOfLife
             Console.WriteLine("Min Cash: " + minCash);
             Console.WriteLine("Average Cash: " + (avgCash) / (long)num);
             Console.WriteLine("Time: " + (DateTime.Now.Ticks - startTime.Ticks) / 10000000 + " seconds");
+            foreach (Career c in Enum.GetValues(typeof(Career)))
+            {
+                Console.WriteLine("Career wins " + c + ": " + ((double)numWinsByCareer[c]/num));
+            }
         }
 
 

@@ -74,7 +74,7 @@ namespace GameOfLife
             this.missTurn = false;
             this.location = start;
             this.rollLog.Clear();
-        }
+        } 
 
         public int Id { get { return this.id; } }
         public bool TryLuckyDay { get { return this.tryLuckyDay; } }
