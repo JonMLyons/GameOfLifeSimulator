@@ -1,6 +1,8 @@
-﻿- Revenge tiles
-- Share the Wealth cards
-- Borrwing from the bank in $20K increments
-- Play the wheel strategies
-- Millionaire tycoon strategy
-- test item
+﻿- Revenge tiles should use a better strategy for choosing who to steal from.
+- Revenge tiles should use real game logic where you cannot steal money from someone unless they have $200,000
+- Simulate Share the Wealth cards
+- Implement borrowing from the bank in discrete $20k increments.
+- Add betting on the wheel as a strategy
+- Add Millionaire Tycoon as an option for winning the game
+- Command line parameters for configuring and starting simulations
+- Better output formatting

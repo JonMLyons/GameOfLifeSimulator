@@ -27,8 +27,13 @@ namespace GameOfLife
             List<Player> players = new List<Player>();
             players.Add(new Player(0, start, true, true, true, true, true, true, true));
             players.Add(new Player(1, start, true, true, true, true, true, true, true));
-
-
+            // players.Add(new Player(2, start, true, true, true, true, true, true, true));
+            // players.Add(new Player(3, start, true, true, true, true, true, true, true));
+            // players.Add(new Player(4, start, true, true, true, true, true, true, true));
+            // players.Add(new Player(5, start, true, true, true, true, true, true, true));
+            // players.Add(new Player(6, start, true, true, true, true, true, true, true));
+            // players.Add(new Player(7, start, true, true, true, true, true, true, true));
+             
             // Run the simulation
             simulateGames(players, true, 1000000);
 
@@ -47,18 +52,21 @@ namespace GameOfLife
                 numWins[i] = 0;
             }
 
-            Dictionary<Career, int> numWinsByCareer = new Dictionary<Career, int>();
-            foreach(Career c in Enum.GetValues(typeof(Career)))
+            Dictionary<Career, int> numPlayersByCareer = new Dictionary<Career, int>();
+            Dictionary<Career, Int64> cashByCareer = new Dictionary<Career, Int64>();
+            foreach (Career c in Enum.GetValues(typeof(Career)))
             {
-                numWinsByCareer.Add(c, 0);
+                numPlayersByCareer.Add(c, 0);
+                cashByCareer.Add(c, 0);
             }
-            
+
             int numSons = 0;
             int numDaughters = 0;
             int minCash = int.MaxValue;
             int maxCash = int.MinValue;
-            long avgCash = 0;
-            int num = 0;            
+            Int64 avgCash = 0;
+            int numPlayers = 0;
+            int maxSalaryWins = 0;      
 
             DateTime startTime = DateTime.Now;
 
@@ -74,6 +82,14 @@ namespace GameOfLife
                     // There is a single winner.
                     Player winner = winners[0];
                     numWins[winner.Id]++;
+
+                    int maxSalary = players.Max(element => element.salary);
+                    if(winner.salary == maxSalary)
+                    {
+                        maxSalaryWins++;
+                    }
+
+
              //       numWinsByCareer[winner.career]++;
                 }
                 else if(winners.Count > 1)
@@ -92,14 +108,15 @@ namespace GameOfLife
                 {
                     numSons += p.sons;
                     numDaughters += p.daughters;
-                    num++;
+                    numPlayers++;
                     if (p.cash < minCash)
                         minCash = p.cash;
                     
                     if (p.cash > maxCash)
                         maxCash = p.cash;
 
-                    numWinsByCareer[p.career]++;
+                    numPlayersByCareer[p.career]++;
+                    cashByCareer[p.career] += p.cash;
                     avgCash += p.cash;
                     p.Reset(start);
                 }
@@ -113,15 +130,16 @@ namespace GameOfLife
             }
 
             Console.WriteLine("Ties:     " + ((double)numTies / numGames));
-            Console.WriteLine("Average Sons: " + ((double)numSons) / num);
-            Console.WriteLine("Average Daughters: " + ((double)numDaughters) / num);
+            Console.WriteLine("Average Sons: " + ((double)numSons) / numPlayers);
+            Console.WriteLine("Average Daughters: " + ((double)numDaughters) / numPlayers);
             Console.WriteLine("Max Cash: " + maxCash);
             Console.WriteLine("Min Cash: " + minCash);
-            Console.WriteLine("Average Cash: " + (avgCash) / (long)num);
+            Console.WriteLine("Average Cash: " + (avgCash) / (long)numPlayers);
+            Console.WriteLine("Player with higest salary wins: " + ((double)maxSalaryWins / numGames));
             Console.WriteLine("Time: " + (DateTime.Now.Ticks - startTime.Ticks) / 10000000 + " seconds");
             foreach (Career c in Enum.GetValues(typeof(Career)))
             {
-                Console.WriteLine("Career wins " + c + ": " + ((double)numWinsByCareer[c]/num));
+                Console.WriteLine("Career " + c + " - Wins: " + ((double)numPlayersByCareer[c]/numPlayers) + " Average cash: " + ((double)cashByCareer[c] / numPlayersByCareer[c]));
             }
         }
 
